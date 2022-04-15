@@ -1,9 +1,13 @@
 package baseball;
 
+import baseball.domain.Computer;
+import baseball.domain.User;
+import baseball.service.Validation;
 import camp.nextstep.edu.missionutils.Randoms;
 import camp.nextstep.edu.missionutils.test.NsTest;
 import org.junit.jupiter.api.Test;
 
+import static baseball.service.Play.playBall;
 import static baseball.util.LengthUtil.getNumberLength;
 import static camp.nextstep.edu.missionutils.test.Assertions.assertRandomNumberInRangeTest;
 import static camp.nextstep.edu.missionutils.test.Assertions.assertSimpleTest;
@@ -25,23 +29,43 @@ class ApplicationTest extends NsTest {
         assertEquals(3, computerNumberLength);
     }
 
-
-
     @Test
-    void 게임종료_후_재시작() {
-        assertRandomNumberInRangeTest(
-                () -> {
-                    run("246", "135", "1", "597", "589", "2");
-                    assertThat(output()).contains("낫싱", "3스트라이크", "1볼 1스트라이크", "3스트라이크", "게임 종료");
-                },
-                1, 3, 5, 5, 8, 9
-        );
+    void 컴퓨터숫자와_던진볼_스크라이크_체크() {
+        String computerNumber = "123";
+        String inputNumber = "123";
+        pitchCheck(computerNumber, new User(inputNumber));
+    }
+
+    public void pitchCheck(String computerNumber, User user) {
+        int strike = 0;
+        int ball = 0;
+        for(int i = 0; i < user.getNumbers().length; i++) {
+            String value = user.getNumbers()[i];
+            if (computerNumber.indexOf(value) == -1) {
+                continue;
+                // NOT
+            }
+            if (computerNumber.indexOf(value) == i) {
+                strike ++;
+                continue;
+                // ST
+            }
+            if (computerNumber.indexOf(value) != i) {
+                ball ++;
+                continue;
+                // BALL
+            }
+        }
+    }
+
+    private void allValidation(String inputNumber) {
+        new Validation(inputNumber);
     }
 
     @Test
     void 예외_테스트() {
         assertSimpleTest(() ->
-                assertThatThrownBy(() -> runException("1234"))
+                assertThatThrownBy(() -> allValidation("1234"))
                         .isInstanceOf(IllegalArgumentException.class)
         );
     }
